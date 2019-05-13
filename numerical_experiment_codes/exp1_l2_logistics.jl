@@ -65,6 +65,7 @@ function MASG(f, ∇f, nk, α, μ, σ)
     x_history = zeros(sum(nk))
     f_history = zeros(sum(nk))
     ymk_history = zeros(sum(nk))
+    grad_history = zeros(sum(nk))
     γ = 1
 
     for k in 1:K
@@ -78,15 +79,14 @@ function MASG(f, ∇f, nk, α, μ, σ)
             ymk_history[γ] = fx_updated
             x_0 = x_1
             x_1 = x_updated .- α[k] .* ∇f(x_updated, σ)
-
-
+            grad_history[γ] = norm(∇f(x_updated, σ),2)
             # Record History
             x_history[γ] = norm(x_1)
             f_history[γ] = f(x_1)
             γ = γ + 1
         end
     end
-    return x_history, f_history, ymk_history
+    return x_history, f_history, ymk_history, grad_history
 end
 
 function compute_nk(κ, p, Δ, σ, label)
@@ -211,7 +211,7 @@ global y = sign.(X * β)
 global K = 12      # number of iterations for MASG
 global η = 8000   # Number of iterations for other methods
 global κ = 1000   # condition number from the paper
-global L = 0.25 * maximum(eigvals(X' * X))
+global L = maximum(eigvals(X' * X))
 global μ = L / κ
 
 σ = sqrt(1e-1)
@@ -220,12 +220,26 @@ global μ = L / κ
 α_MASG = compute_MASG_α(L)
 ## MASG Thm 3.7
 nk_7 = compute_nk(κ, 1, norm(β,2), σ, 3.7)
-x_MASG_7, f_MASG_7, ymk_MASG_7 = MASG(f, ∇f, nk_7, α_MASG, μ, σ)
+x_MASG_7, f_MASG_7, ymk_MASG_7, grad_MASG_7 = MASG(f, ∇f, nk_7, α_MASG, μ, σ)
 
-plot(x_MASG_7,xscale=:log,yscale=:log)
-plot(ymk_MASG_7,xscale=:log,yscale=:log)
+cumulative = zeros(12)
+cumulative[1] = 219
+for i in 2:12
+    cumulative[i] = cumulative[i-1] + nk_7[i]
+end
+cumulative
 
-
+plot(x_MASG_7,xscale=:log,yscale=:log,label="x",legend=:bottomleft,w=2)
+plot!(ymk_MASG_7,xscale=:log,yscale=:log,label="intermediate variable",w=2)
+plot!(grad_MASG_7, label="gradient",w=.5,alpha=0.5,color=:black)
+plot!(f_MASG_7,xscale=:log,yscale=:log, label="Objective",w=2)
+vline!(cumulative, label="stage",w=1,color=:grey)
+xlabel!("Iteration Count")
+ylabel!("log(f)")
+savefig("./figures/illustration.png")
+plot(α_MASG,label="step size")
+xlabel!("stage")
+savefig("./figures/stepsize.png")
 ## MASG Thm 4
 nk_4 = compute_nk(κ, 1, norm(β,2), σ, 4.0)
 x_MASG_4, f_MASG_4, ymk_MASG_4 = MASG(f, ∇f, nk_4, α_MASG, μ, σ)
