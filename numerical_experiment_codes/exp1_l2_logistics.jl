@@ -64,14 +64,18 @@ function MASG(f, ∇f, nk, α, μ, σ)
     # Record Histories
     x_history = zeros(sum(nk))
     f_history = zeros(sum(nk))
+    ymk_history = zeros(sum(nk))
     γ = 1
 
     for k in 1:K
         x_0 = x_1
         for m in 1:nk[k]
             w = (1 - sqrt(μ * α[k])) / (1 + sqrt(μ * α[k]))
+            @show w
             x_updated = (1 + w) .* x_1 - w .* x_0
+            @show x_updated
             fx_updated = f(x_updated)
+            ymk_history[γ] = fx_updated
             x_0 = x_1
             x_1 = x_updated .- α[k] .* ∇f(x_updated, σ)
 
@@ -82,7 +86,7 @@ function MASG(f, ∇f, nk, α, μ, σ)
             γ = γ + 1
         end
     end
-    return x_history, f_history
+    return x_history, f_history, ymk_history
 end
 
 function compute_nk(κ, p, Δ, σ, label)
@@ -196,7 +200,7 @@ function μAGD(f, ∇f, A, a, σ, mode)
 end
 
 ## Data setup
-global n = 10000    # number of datapoints
+global n = 1000    # number of datapoints
 global d = 100    # number of dimensions
 global λ = 0.01   # Penalty for beta term
 global X = rand(Normal(0,1), (n,d))
@@ -216,10 +220,15 @@ global μ = L / κ
 α_MASG = compute_MASG_α(L)
 ## MASG Thm 3.7
 nk_7 = compute_nk(κ, 1, norm(β,2), σ, 3.7)
-x_MASG_7, f_MASG_7 = MASG(f, ∇f, nk_7, α_MASG, μ, σ)
+x_MASG_7, f_MASG_7, ymk_MASG_7 = MASG(f, ∇f, nk_7, α_MASG, μ, σ)
+
+plot(x_MASG_7,xscale=:log,yscale=:log)
+plot(ymk_MASG_7,xscale=:log,yscale=:log)
+
+
 ## MASG Thm 4
 nk_4 = compute_nk(κ, 1, norm(β,2), σ, 4.0)
-x_MASG_4, f_MASG_4 = MASG(f, ∇f, nk_4, α_MASG, μ, σ)
+x_MASG_4, f_MASG_4, ymk_MASG_4 = MASG(f, ∇f, nk_4, α_MASG, μ, σ)
 
 # Vanilla Gradient Descent
 x_GD, f_GD = GD(f, ∇f, σ)
