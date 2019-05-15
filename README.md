@@ -5,7 +5,9 @@ FInal Project for IEOR 290, Spring 2019, UC Berkeley
 Chenyang Zhu
 
 # Abstract
-In this project, we study stochastic optimization problems with noisy first order gradient descents. We compare the related algorithms on convergence rate in terms of their bias and variance bounds. Two computational examples are computed for strongly convex and non-strongly convex cases to compare methods that are designed for optimal convergence. We also applied the flexible step-size method proposed in Multistage Accelerated Stochastic Gradient Descent (MASG, \cite{MASG}) to Accelerated Stochastic Approximation Algorithm (ACSA, \cite{ACSA}). Our results show that while the stabilization in MASG seems to work well, it is not yet a universal method and that a more rigorous proof might be necessary before applying this idea to other methods.
+In this project, we study stochastic optimization problems with noisy first order gradient descents. We compare the related algorithms on convergence rate in terms of their bias and variance bounds. Two computational examples are computed for strongly convex and non-strongly convex cases to compare methods that are designed for optimal convergence. We also applied the flexible step-size method proposed in Multistage Accelerated Stochastic Gradient Descent (MASG) to Accelerated Stochastic Approximation Algorithm (ACSA). Our results show that while the stabilization in MASG seems to work well, it is not yet a universal method and that a more rigorous proof might be necessary before applying this idea to other methods.
+
+Download paper [here]()
 
 # Computational Results
 
