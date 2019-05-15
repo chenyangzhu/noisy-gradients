@@ -27,7 +27,7 @@ function ∇f(β)
     β: 100 x 1
     σ: noise
     =#
-    return X' * (X * β - y) ./n .+ λ + rand(Normal(0,σ^2), (d,1))
+    return X' * (X * β - y) ./n .+ λ .* sign.(β) .+ rand(Normal(0,σ^2), (d,1))
 end
 
 # MASG
